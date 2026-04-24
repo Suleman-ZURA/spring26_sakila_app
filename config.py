@@ -1,4 +1,4 @@
-#Suleman and Malik Muhammad Suleman Awan - 4/25/2026 .
+#Suleman and Malik Muhammad Suleman Awan - 4/25/2026 
 import os
 
 class Config:
