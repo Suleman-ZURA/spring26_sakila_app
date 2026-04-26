@@ -521,7 +521,7 @@ def export_films():
         output = StringIO()
         writer = csv.writer(output)
         writer.writerow(['ID', 'Title', 'Description', 'Release Year', 'Rental Rate',
-                        'Length', 'Rating', 'Category', 'Language', 'Replacement Cost','Rental Duration', 'Special Features'])
+                        'Length', 'Rating', 'Category', 'Language', 'Replacement Cost', 'Rental Duration', 'Special Features'])
 
         for film in films_data:
             writer.writerow([
