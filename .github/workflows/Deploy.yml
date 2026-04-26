@@ -71,4 +71,5 @@ on:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify
-        run: echo "Slack notification: Production deployment successful"
+        run: |
+             echo "Slack notification: Deployment to staging successful"
