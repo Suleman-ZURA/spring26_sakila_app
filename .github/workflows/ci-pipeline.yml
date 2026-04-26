@@ -39,6 +39,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
 
+    env:
+      PYTHONPATH: .
+
     services:
       mysql:
         image: mysql:8.0
