@@ -42,9 +42,11 @@ on:
           echo "## 🚀 Staging Deployment Successful" >> $GITHUB_STEP_SUMMARY
           echo "Image: sakila-app:staging" >> $GITHUB_STEP_SUMMARY
           echo "Status: SUCCESS" >> $GITHUB_STEP_SUMMARY
-
       - name: Notify
-        run: echo "Slack notification: Deployment to staging successful"
+        run: |
+          echo "Slack notification: Deployment to staging successful"
+      
+      
     deploy-production:
     runs-on: ubuntu-latest
     needs: deploy-staging
