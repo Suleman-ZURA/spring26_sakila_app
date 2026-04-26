@@ -1,4 +1,4 @@
-#Suleman and Malik Muhammad Suleman Awan - 4/25/2026 
+# Suleman and Malik Muhammad Suleman Awan - 4/25/2026 .
 import os
 
 
@@ -7,4 +7,8 @@ class Config:
     MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
     MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'admin')
     MYSQL_DB = os.environ.get('MYSQL_DB', 'sakila')
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-this-in-production')
+    SECRET_KEY = os.environ.get(
+        'SECRET_KEY',
+        'your-secret-key-here-change-this-in-production'
+    )
+    
