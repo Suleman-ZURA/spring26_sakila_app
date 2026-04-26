@@ -3,6 +3,7 @@ import pymysql
 from config import Config
 import csv
 from io import StringIO
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -86,25 +87,25 @@ def dashboard():
 
         conn.close()
         return render_template('dashboard.html',
-                             total_films=total_films,
-                             total_actors=total_actors,
-                             total_customers=total_customers,
-                             active_rentals=active_rentals,
-                             revenue_stats=revenue_stats,
-                             recent_rentals=recent_rentals,
-                             popular_films=popular_films,
-                             store_stats=store_stats)
+                               total_films=total_films,
+                               total_actors=total_actors,
+                               total_customers=total_customers,
+                               active_rentals=active_rentals,
+                               revenue_stats=revenue_stats,
+                               recent_rentals=recent_rentals,
+                               popular_films=popular_films,
+                               store_stats=store_stats)
     except Exception as e:
         flash(f'Error loading dashboard: {str(e)}', 'error')
         return render_template('dashboard.html',
-                             total_films=0,
-                             total_actors=0,
-                             total_customers=0,
-                             active_rentals=0,
-                             revenue_stats={'total_revenue': 0, 'avg_rental_price': 0, 'total_transactions': 0},
-                             recent_rentals=[],
-                             popular_films=[],
-                             store_stats=[])
+                               total_films=0,
+                               total_actors=0,
+                               total_customers=0,
+                               active_rentals=0,
+                               revenue_stats={'total_revenue': 0, 'avg_rental_price': 0, 'total_transactions': 0},
+                               recent_rentals=[],
+                               popular_films=[],
+                               store_stats=[])
 
 
 # Films Routes with Search and Pagination
@@ -198,33 +199,33 @@ def films():
         total_pages = (total + per_page - 1) // per_page
 
         return render_template('films.html',
-                             films=films,
-                             categories=categories,
-                             ratings=ratings,
-                             year_range=year_range,
-                             search=search,
-                             selected_category=category,
-                             selected_rating=rating,
-                             min_year=min_year,
-                             max_year=max_year,
-                             page=page,
-                             total_pages=total_pages,
-                             total=total)
+                               films=films,
+                               categories=categories,
+                               ratings=ratings,
+                               year_range=year_range,
+                               search=search,
+                               selected_category=category,
+                               selected_rating=rating,
+                               min_year=min_year,
+                               max_year=max_year,
+                               page=page,
+                               total_pages=total_pages,
+                               total=total)
     except Exception as e:
         flash(f'Error fetching films: {str(e)}', 'error')
         return render_template('films.html',
-                             films=[],
-                             categories=[],
-                             ratings=[],
-                             year_range={'min_year': 1900, 'max_year': 2100},
-                             search=search,
-                             selected_category=category,
-                             selected_rating=rating,
-                             min_year=min_year,
-                             max_year=max_year,
-                             page=1,
-                             total_pages=1,
-                             total=0)
+                               films=[],
+                               categories=[],
+                               ratings=[],
+                               year_range={'min_year': 1900, 'max_year': 2100},
+                               search=search,
+                               selected_category=category,
+                               selected_rating=rating,
+                               min_year=min_year,
+                               max_year=max_year,
+                               page=1,
+                               total_pages=1,
+                               total=0)
 
 
 @app.route('/films/add', methods=['GET', 'POST'])
@@ -263,12 +264,12 @@ def add_film():
                 # Add film-category relationship
                 if category_id:
                     cur.execute('INSERT INTO film_category (film_id, category_id) VALUES (%s, %s)',
-                               (film_id, category_id))
+                                (film_id, category_id))
 
                 # Add film-actor relationships
                 for actor_id in actors:
                     cur.execute('INSERT INTO film_actor (film_id, actor_id) VALUES (%s, %s)',
-                               (film_id, actor_id))
+                                (film_id, actor_id))
 
                 conn.commit()
             conn.close()
@@ -298,10 +299,10 @@ def add_film():
         actors = []
 
     return render_template('film_form.html',
-                         film=None,
-                         languages=languages,
-                         categories=categories,
-                         actors=actors)
+                           film=None,
+                           languages=languages,
+                           categories=categories,
+                           actors=actors)
 
 
 @app.route('/films/edit/<int:film_id>', methods=['GET', 'POST'])
@@ -338,13 +339,13 @@ def edit_film(film_id):
                 cur.execute('DELETE FROM film_category WHERE film_id = %s', (film_id,))
                 if category_id:
                     cur.execute('INSERT INTO film_category (film_id, category_id) VALUES (%s, %s)',
-                               (film_id, category_id))
+                                (film_id, category_id))
 
                 # Update film-actor relationships
                 cur.execute('DELETE FROM film_actor WHERE film_id = %s', (film_id,))
                 for actor_id in actors:
                     cur.execute('INSERT INTO film_actor (film_id, actor_id) VALUES (%s, %s)',
-                               (film_id, actor_id))
+                                (film_id, actor_id))
 
                 conn.commit()
             conn.close()
@@ -394,10 +395,10 @@ def edit_film(film_id):
         conn.close()
 
         return render_template('film_form.html',
-                             film=film,
-                             languages=languages,
-                             categories=categories,
-                             actors=actors)
+                               film=film,
+                               languages=languages,
+                               categories=categories,
+                               actors=actors)
     except Exception as e:
         if 'conn' in locals():
             conn.close()
@@ -489,11 +490,11 @@ def film_detail(film_id):
 
         conn.close()
         return render_template('film_detail.html',
-                             film=film,
-                             actors=actors,
-                             inventory_count=inventory_count,
-                             rental_stats=rental_stats,
-                             revenue=revenue)
+                               film=film,
+                               actors=actors,
+                               inventory_count=inventory_count,
+                               rental_stats=rental_stats,
+                               revenue=revenue)
     except Exception as e:
         flash(f'Error loading film details: {str(e)}', 'error')
         return redirect(url_for('films'))
@@ -636,26 +637,26 @@ def actors():
         total_pages = (total + per_page - 1) // per_page
 
         return render_template('actors.html',
-                             actors=actors_list,
-                             popular_actors=popular_actors,
-                             most_films_count=most_films_count,
-                             search=search,
-                             sort=sort,
-                             page=page,
-                             total_pages=total_pages,
-                             total=total)
+                               actors=actors_list,
+                               popular_actors=popular_actors,
+                               most_films_count=most_films_count,
+                               search=search,
+                               sort=sort,
+                               page=page,
+                               total_pages=total_pages,
+                               total=total)
     except Exception as e:
         flash(f'Error fetching actors: {str(e)}', 'error')
         # Return all required variables even in case of error
         return render_template('actors.html',
-                             actors=[],
-                             popular_actors=[],
-                             most_films_count=0,
-                             search=search,
-                             sort=sort,
-                             page=1,
-                             total_pages=1,
-                             total=0)
+                               actors=[],
+                               popular_actors=[],
+                               most_films_count=0,
+                               search=search,
+                               sort=sort,
+                               page=1,
+                               total_pages=1,
+                               total=0)
 
 
 @app.route('/actors/add', methods=['POST'])
@@ -667,7 +668,7 @@ def add_actor():
         conn = get_db_connection()
         with conn.cursor() as cur:
             cur.execute('INSERT INTO actor (first_name, last_name) VALUES (%s, %s)',
-                       (first_name, last_name))
+                        (first_name, last_name))
             conn.commit()
         conn.close()
         flash('Actor added successfully!', 'success')
@@ -686,7 +687,7 @@ def edit_actor(actor_id):
         conn = get_db_connection()
         with conn.cursor() as cur:
             cur.execute('UPDATE actor SET first_name=%s, last_name=%s WHERE actor_id=%s',
-                       (first_name, last_name, actor_id))
+                        (first_name, last_name, actor_id))
             conn.commit()
         conn.close()
         flash('Actor updated successfully!', 'success')
@@ -840,19 +841,19 @@ def customers():
 
         total_pages = (total + per_page - 1) // per_page
         return render_template('customers.html',
-                             customers=customers_list,
-                             search=search,
-                             page=page,
-                             total_pages=total_pages,
-                             total=total)
+                               customers=customers_list,
+                               search=search,
+                               page=page,
+                               total_pages=total_pages,
+                               total=total)
     except Exception as e:
         flash(f'Error fetching customers: {str(e)}', 'error')
         return render_template('customers.html',
-                             customers=[],
-                             search=search,
-                             page=1,
-                             total_pages=1,
-                             total=0)
+                               customers=[],
+                               search=search,
+                               page=1,
+                               total_pages=1,
+                               total=0)
 
 
 # Rentals Management
@@ -908,19 +909,19 @@ def rentals():
 
         total_pages = (total + per_page - 1) // per_page
         return render_template('rentals.html',
-                             rentals=rentals_list,
-                             status=status,
-                             page=page,
-                             total_pages=total_pages,
-                             total=total)
+                               rentals=rentals_list,
+                               status=status,
+                               page=page,
+                               total_pages=total_pages,
+                               total=total)
     except Exception as e:
         flash(f'Error fetching rentals: {str(e)}', 'error')
         return render_template('rentals.html',
-                             rentals=[],
-                             status=status,
-                             page=1,
-                             total_pages=1,
-                             total=0)
+                               rentals=[],
+                               status=status,
+                               page=1,
+                               total_pages=1,
+                               total=0)
 
 
 # Staff Management
@@ -1019,27 +1020,27 @@ def inventory():
 
         total_pages = (total + per_page - 1) // per_page
         return render_template('inventory.html',
-                             inventory_items=inventory_items,
-                             films=films_list,
-                             stores=stores_list,
-                             film_filter=film_filter,
-                             store_filter=store_filter,
-                             status_filter=status_filter,
-                             page=page,
-                             total_pages=total_pages,
-                             total=total)
+                               inventory_items=inventory_items,
+                               films=films_list,
+                               stores=stores_list,
+                               film_filter=film_filter,
+                               store_filter=store_filter,
+                               status_filter=status_filter,
+                               page=page,
+                               total_pages=total_pages,
+                               total=total)
     except Exception as e:
         flash(f'Error fetching inventory: {str(e)}', 'error')
         return render_template('inventory.html',
-                             inventory_items=[],
-                             films=[],
-                             stores=[],
-                             film_filter=film_filter,
-                             store_filter=store_filter,
-                             status_filter=status_filter,
-                             page=1,
-                             total_pages=1,
-                             total=0)
+                               inventory_items=[],
+                               films=[],
+                               stores=[],
+                               film_filter=film_filter,
+                               store_filter=store_filter,
+                               status_filter=status_filter,
+                               page=1,
+                               total_pages=1,
+                               total=0)
 
 
 # Store Management
@@ -1120,15 +1121,15 @@ def reports():
 
         conn.close()
         return render_template('reports.html',
-                             monthly_revenue=monthly_revenue,
-                             top_films=top_films,
-                             top_customers=top_customers)
+                               monthly_revenue=monthly_revenue,
+                               top_films=top_films,
+                               top_customers=top_customers)
     except Exception as e:
         flash(f'Error generating reports: {str(e)}', 'error')
         return render_template('reports.html',
-                             monthly_revenue=[],
-                             top_films=[],
-                             top_customers=[])
+                               monthly_revenue=[],
+                               top_films=[],
+                               top_customers=[])
 
 
 @app.route('/rentals/return/<int:rental_id>', methods=['POST'])
@@ -1137,7 +1138,7 @@ def return_rental(rental_id):
         conn = get_db_connection()
         with conn.cursor() as cur:
             cur.execute('UPDATE rental SET return_date = NOW() WHERE rental_id = %s AND return_date IS NULL',
-                       (rental_id,))
+                        (rental_id,))
             if cur.rowcount == 0:
                 flash('Rental not found or already returned.', 'error')
             else:
