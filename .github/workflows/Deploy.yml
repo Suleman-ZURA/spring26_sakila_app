@@ -1,5 +1,8 @@
 name: Deployment Pipeline
 
+permissions:
+  contents: write
+  
 on:
   push:
     branches:
