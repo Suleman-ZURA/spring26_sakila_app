@@ -12,11 +12,6 @@ on:
       - 'Dockerfile'
       - 'requirements.txt'
       - 'docker-compose.yml'
-    paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - '*.md'
-      - '.gitignore'
 
 env:
   IMAGE_NAME: sakila-app
