@@ -1,8 +1,9 @@
+#Suleman and Malik Muhammad Suleman Awan - 4/25/2026 
 import os
 
 
 class Config:
-    MYSQL_HOST = os.environ.get('MYSQL_HOST', 'mysql-container')
+    MYSQL_HOST = os.environ.get('MYSQL_HOST', 'sakila-db-server')
     MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
     MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'admin')
     MYSQL_DB = os.environ.get('MYSQL_DB', 'sakila')
