@@ -1,78 +1,72 @@
-name: Sakila Deployment Workflow
+name: Deployment Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
-      - 'app.py'
-      - 'config.py'
-      - 'templates/**'
-      - 'static/**'
-      - 'Dockerfile'
-      - 'requirements.txt'
-      - 'docker-compose.yml'
-    paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - '*.md'
-      - '.gitignore'
+      - "app.py"
+      - "config.py"
+      - "templates/**"
+      - "static/**"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "docker-compose.yml"
 
-env:
-  IMAGE_NAME: sakila-app
-
-jobs:
-  deploy-staging:
-    name: Deploy to Staging
+      # Ignore these
+      - "!README.md"
+      - "!docs/**"
+      - "!*.md"
+      - "!.gitignore"
+  jobs:
+    deploy-staging:
     runs-on: ubuntu-latest
     environment: staging
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Simulate Staging Deployment
-        run: |
-          echo "Deploying to STAGING environment..."
-          echo "Environment Variable Check: DB_HOST=staging-db"
+      - name: Print environment variables
+        run: echo "Deploying to STAGING environment"
 
-      - name: Generate Job Summary
-        run: |
-          echo "### 🚀 Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment:** Staging" >> $GITHUB_STEP_SUMMARY
-          echo "- **Deployed at:** $(date)" >> $GITHUB_STEP_SUMMARY
+      - name: Build Docker image (staging)
+        run: docker build -t sakila-app:staging .
 
-      - name: Notification
+      - name: Run container (simulation)
+        run: |
+          docker run -d -p 5001:5000 sakila-app:staging
+          sleep 5
+          curl http://localhost:5001 || true
+
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Staging Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "Image: sakila-app:staging" >> $GITHUB_STEP_SUMMARY
+          echo "Status: SUCCESS" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify
         run: echo "Slack notification: Deployment to staging successful"
-
-  deploy-production:
-    name: Deploy to Production
-    needs: deploy-staging
+    deploy-production:
     runs-on: ubuntu-latest
-    environment: 
-      name: production # Triggers manual approval in GitHub Settings
-    
+    needs: deploy-staging
+    environment: production
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set Release Version
-        id: vars
-        run: echo "tag=v$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
+      - name: Deploy to production
+        run: echo "🚀 Deploying to PRODUCTION..."
 
-      - name: Simulate Production Deployment
-        run: |
-          echo "Simulated production deployment message: Moving traffic to live servers..."
-          echo "Version: ${{ steps.vars.outputs.tag }}"
+      - name: Create Release Tag
+        id: tag
+        run: echo "VERSION=v$(date +'%Y.%m.%d')" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.vars.outputs.tag }}
-          name: Release ${{ steps.vars.outputs.tag }}
-          body: |
-            Automated production release.
-            Built from commit: ${{ github.sha }}
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Notification
-        run: echo "Slack notification: Deployment to production successful"
+      - name: Notify
+        run: echo "Slack notification: Production deployment successful"
