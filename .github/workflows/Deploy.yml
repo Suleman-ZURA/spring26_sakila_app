@@ -20,7 +20,6 @@ on:
 
 env:
   IMAGE_NAME: sakila-app
-  PYTHON_VERSION: "3.9"
 
 jobs:
   deploy-staging:
@@ -33,10 +32,7 @@ jobs:
       - name: Simulate Staging Deployment
         run: |
           echo "Deploying to STAGING environment..."
-          echo "Environment Variable Check: DB_HOST=${{ secrets.STAGING_DB_HOST || 'staging-db' }}"
-          echo "Pulling Docker Image: ${{ env.IMAGE_NAME }}:staging"
-          # Simulating running the container
-          echo "Container started on port 5001"
+          echo "Environment Variable Check: DB_HOST=staging-db"
 
       - name: Generate Job Summary
         run: |
@@ -44,7 +40,6 @@ jobs:
           echo "- **Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment:** Staging" >> $GITHUB_STEP_SUMMARY
           echo "- **Deployed at:** $(date)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Notification
         run: echo "Slack notification: Deployment to staging successful"
@@ -54,26 +49,28 @@ jobs:
     needs: deploy-staging
     runs-on: ubuntu-latest
     environment: 
-      name: production
+      name: production # Triggers manual approval in GitHub Settings
     
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set Release Version
+        id: vars
+        run: echo "tag=v$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
+
       - name: Simulate Production Deployment
         run: |
           echo "Simulated production deployment message: Moving traffic to live servers..."
-          echo "Version: v$(date +'%Y.%m.%d')"
+          echo "Version: ${{ steps.vars.outputs.tag }}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}-${{ github.run_id }}
-          name: Release v$(date +'%Y.%m.%d')
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: Release ${{ steps.vars.outputs.tag }}
           body: |
-            Automated production release from Sakila CI/CD Pipeline.
+            Automated production release.
             Built from commit: ${{ github.sha }}
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
