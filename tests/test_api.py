@@ -33,3 +33,4 @@ def test_film_api_returns_json_error_when_db_fails(monkeypatch):
     data = response.get_json()
     assert data is not None
     assert "error" in data
+    

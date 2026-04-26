@@ -1,5 +1,6 @@
 import os
 
+
 class Config:
     MYSQL_HOST = os.environ.get('MYSQL_HOST', 'mysql-container')
     MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
