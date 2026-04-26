@@ -2,7 +2,8 @@ name: Deployment Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - "app.py"
       - "config.py"
@@ -11,56 +12,64 @@ on:
       - "Dockerfile"
       - "requirements.txt"
       - "docker-compose.yml"
-
-      # Ignore these
       - "!README.md"
       - "!docs/**"
       - "!*.md"
       - "!.gitignore"
-  jobs:
-    deploy-staging:
+
+jobs:
+
+  deploy-staging:
     runs-on: ubuntu-latest
     environment: staging
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Print environment variables
-        run: echo "Deploying to STAGING environment"
+      - name: Print environment
+        run: |
+          echo "Deploying to STAGING environment"
 
-      - name: Build Docker image (staging)
-        run: docker build -t sakila-app:staging .
+      - name: Build Docker image
+        run: |
+          docker build -t sakila-app:staging .
 
       - name: Run container (simulation)
         run: |
-          docker run -d -p 5001:5000 sakila-app:staging
-          sleep 5
+          docker run -d -p 5001:5000 --name staging-test sakila-app:staging
+          sleep 10
           curl http://localhost:5001 || true
+          docker stop staging-test
 
       - name: Deployment Summary
         run: |
           echo "## 🚀 Staging Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "Environment: staging" >> $GITHUB_STEP_SUMMARY
           echo "Image: sakila-app:staging" >> $GITHUB_STEP_SUMMARY
           echo "Status: SUCCESS" >> $GITHUB_STEP_SUMMARY
+
       - name: Notify
         run: |
           echo "Slack notification: Deployment to staging successful"
-      
-      
-    deploy-production:
+
+
+  deploy-production:
     runs-on: ubuntu-latest
     needs: deploy-staging
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Deploy to production
-        run: echo "🚀 Deploying to PRODUCTION..."
+      - name: Deploy message
+        run: |
+          echo "🚀 Deploying to PRODUCTION environment..."
 
-      - name: Create Release Tag
-        id: tag
-        run: echo "VERSION=v$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+      - name: Generate version
+        run: |
+          echo "VERSION=v$(date +'%Y.%m.%d')" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -72,4 +81,4 @@ on:
 
       - name: Notify
         run: |
-             echo "Slack notification: Deployment to staging successful"
+          echo "Slack notification: Production deployment successful"
