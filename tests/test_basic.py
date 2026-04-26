@@ -33,4 +33,3 @@ def test_dashboard_route_handles_database_error(monkeypatch):
 
     assert response.status_code == 200
     assert b"dashboard fallback rendered" in response.data
-    
