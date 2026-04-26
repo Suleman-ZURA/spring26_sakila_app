@@ -1,4 +1,6 @@
 name: Sakila CI Pipeline
+        run: |
+          mysql -h127.0.0.1 -uroot -padmin sakila < sakila-db/sakila-schema.sql
           mysql -h127.0.0.1 -uroot -padmin sakila < sakila-db/sakila-data.sql
 
       - name: Run tests
@@ -31,6 +33,7 @@ name: Sakila CI Pipeline
           sleep 10
           curl http://localhost:5000 || true
           docker stop smoke
+
 
 
   security-scan:
